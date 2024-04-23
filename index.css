@@ -1,0 +1,36 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+
+html, body{
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+#display{
+    border: 2px solid red;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+#productsCard{
+    width: 200px;
+    height: 300px;
+    border: 2px solid black;
+    overflow: hidden;
+}
+
+#productsCard > #imgDiv{
+    width: 100%;
+    height: 70%;
+    border: 1px solid black;
+}
+
+#imgDiv > img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
