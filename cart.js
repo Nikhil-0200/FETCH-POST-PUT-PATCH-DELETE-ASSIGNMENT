@@ -1,4 +1,7 @@
 let display = document.querySelector("#display");
+let namess = JSON.parse(localStorage.getItem("loginUserName"));
+let total = document.getElementById("total");
+
 
 async function fetchCartData() {
   try {
@@ -13,60 +16,82 @@ async function fetchCartData() {
 fetchCartData();
 
 function showCartData(data) {
-  console.log(data);
+  let localStorageName = JSON.parse(localStorage.getItem("loginUserName"));
 
   for (let key in data) {
-    let cartDataArray = data[key];
+    if (key === localStorageName) {
+      data[key].forEach((ele, index) => {
+        let productsCard = document.createElement("div");
+        productsCard.id = "productsCard";
 
-    cartDataArray.forEach((ele) => {
-      let productsCard = document.createElement("div");
-      productsCard.id = "productsCard";
+        let imgDiv = document.createElement("div");
+        imgDiv.id = "imgDiv";
 
-      let imgDiv = document.createElement("div");
-      imgDiv.id = "imgDiv";
+        let img = document.createElement("img");
+        img.src = ele.src;
 
-      let img = document.createElement("img");
-      img.src = ele.src;
+        let title = document.createElement("p");
+        title.textContent = ele.title;
 
-      let title = document.createElement("p");
-      title.textContent = ele.title;
+        let rating = document.createElement("p");
+        rating.textContent = ele.ratings;
 
-      let rating = document.createElement("p");
-      rating.textContent = ele.ratings;
+        let price = document.createElement("p");
+        price.textContent = ele.price;
 
-      let price = document.createElement("p");
-      price.textContent = ele.price;
+        let btnDiv = document.createElement("div");
+        btnDiv.id = "btnDiv";
 
-      let btnDiv = document.createElement("div");
-      btnDiv.id = "btnDiv";
+        let dltBtn = document.createElement("button");
+        dltBtn.textContent = "🗑️";
 
-      let dltBtn = document.createElement("button");
-      dltBtn.textContent = "🗑️";
+        dltBtn.addEventListener("click", () => {
+          dltBtnFnc(ele, index);
+        });
 
-      dltBtn.addEventListener("click", ()=>{
-        dltBtnFnc(ele.id)
-      })
+        imgDiv.append(img);
+        btnDiv.append(dltBtn);
 
-      imgDiv.append(img);
-      btnDiv.append(dltBtn);
+        productsCard.append(imgDiv, title, rating, price, btnDiv);
+        display.append(productsCard);
+      });
 
-      productsCard.append(imgDiv, title, rating, price, btnDiv);
-      display.append(productsCard);
-    });
-
-    
+    }
   }
 }
 
+async function calculateTotalPrice(){
+  let res = await fetch("http://localhost:3000/allUsersCart");
+  let finalData = await res.json();
 
-function dltBtnFnc(id){
-    fetch(`http://localhost:3000/allUsersCart/Nikhil/${id}`, {
-        method: "DELETE", 
-        headers:{
-            "Content-Type": "application/json"
-        },
-    })
+  let newArray = finalData[namess];
 
-    console.log(id);
+  console.log(newArray);
+
+  let result = newArray.reduce((acc, curr)=> acc + curr.price, 0);
+
+console.log(result);
+
+total.textContent = `Total Price: ${result}`
+
+
 }
 
+calculateTotalPrice()
+
+async function dltBtnFnc(ele, index) {
+  let res = await fetch("http://localhost:3000/allUsersCart");
+  let finalData = await res.json();
+
+  finalData[namess].splice(index, 1);
+
+  console.log();
+
+  fetch("http://localhost:3000/allUsersCart", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(finalData),
+  });
+}

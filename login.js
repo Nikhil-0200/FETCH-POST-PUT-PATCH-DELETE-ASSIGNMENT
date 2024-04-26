@@ -38,32 +38,29 @@ async function fetchUserData() {
 }
 
 function compareData(finalData) {
-  finalData.forEach((element) => {
-    if (
-      element.name === obj.name &&
-      element.email === obj.email &&
-      element.password === obj.password
-    ) {
-      nameVariable.push(element.name);
-      postUserName(nameVariable)
-      console.log(nameVariable);
-      window.location.href = "index.html";
-    } else {
-      alert("Enter Valid Details");
+
+  let flag = false;
+
+  finalData.forEach((ele)=>{
+    if(ele.email === obj.email){
+      if(ele.password === obj.password){
+        flag = true;
+        localStorage.setItem("loginUserName", JSON.stringify(ele.name))
+        alert("Login Sucessfull")
+        window.location.href = "index.html"
+        
+      }
+      else{
+        alert("Wrong Password")
+      }
     }
-  });
+
+   
+
+  })
+
+  if(flag == false){
+    alert("User Not Found, Please Register")
+  }
 }
 
-function postUserName(userName) {
-  let data = {
-    [userName]: []
-  };
-
-  fetch("http://localhost:3000/allUsersCart", {
-    method: "POST", 
-    headers:{
-        "Content-Type" : "application/json"
-    },
-    body: JSON.stringify(data)
-  });
-}

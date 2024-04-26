@@ -1,5 +1,14 @@
 let display = document.querySelector("#display");
 let userName = document.querySelector("#userName");
+let logout = document.getElementById("logout");
+
+let namess = JSON.parse(localStorage.getItem("loginUserName"))
+userName.textContent = namess
+
+logout.addEventListener("click", ()=>{
+    localStorage.removeItem("loginUserName")
+    location.reload()
+})
 
 
 async function fetchData(url){
@@ -39,58 +48,46 @@ function showProducts(products){
         let btnDiv = document.createElement("div");
         btnDiv.id = "btnDiv";
 
-        let dltBtn = document.createElement("button");
-        dltBtn.textContent = "🛒"
-        dltBtn.addEventListener("click", ()=>{
+        let addBtn = document.createElement("button");
+        addBtn.textContent = "🛒"
+        addBtn.addEventListener("click", ()=>{
             addToCart(ele, index)
         })
 
-        btnDiv.append(dltBtn)
+        btnDiv.append(addBtn)
         imgDiv.append(img);
         productsCard.append(imgDiv, title, rating, price, btnDiv)
         display.append(productsCard)
     })
 }
 
-async function  getUserData(){
-    let res = await fetch(cartURL);
-    let finalData = await res.json()
-
-    for(let key in finalData){
-        userName.textContent = key
-    }
-
-    return finalData;
-
-}
-
 
 async function addToCart(ele, index){
 
-    let cartData = {};
+    let res = await fetch("http://localhost:3000/allUsersCart");
+    let data = await res.json();
 
-    cartData.id = generateUserId();
-    cartData.title = ele.title;
-    cartData.src = ele.src;
-    cartData.price = ele.price;
-    cartData.ratings = ele.ratings;
-
-    let currentCartData = await getUserData()
-
-    if(currentCartData.hasOwnProperty(userName.textContent)){
-        currentCartData[userName.textContent].push(cartData)
+    if(data[namess] === undefined){
+        data[namess] = [];
+        data[namess].push(ele)
     }
     else{
-        currentCartData[userName.textContent] = [cartData]
+        data[namess].push(ele)
     }
 
-    fetch(cartURL, {
-        method:"PATCH",
+
+
+
+
+    fetch("http://localhost:3000/allUsersCart", {
+        method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(currentCartData)
+        body: JSON.stringify(data)
     })
+
+
 }
 
 function generateUserId() {

@@ -82,9 +82,18 @@ ul > a > li {
   padding: 5px;
 }
 
-#userName{
+#userName , #logout{
   position: absolute;
   right: 10%
+}
+#logout{
+  position: absolute;
+  right: 25%
+}
+
+#total{
+  position: absolute;
+  right: 15%
 }
 
 #btnDiv{
